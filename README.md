@@ -1,4 +1,5 @@
 # Term-Project-Bayesian-Regression-Analysis
+## Sound inventory size vs. population size<br/>
 A bayesian regression analysis with R and Stan.<br/>
 Conduct a series of Bayesian regression analyses to test whether an association between 2 variables is genuine, with rethinking package.<br/>
  Specifically, fit the following models:<br/>
