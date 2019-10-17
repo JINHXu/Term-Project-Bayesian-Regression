@@ -37,7 +37,7 @@ dd$np_std <- dd$nPhonemes /max(dd$nPhonemes)
 
 print(mean(dd$np_std))
 
-dat <- list(
+dat1.1 <- list(
   pop = dd$log_pop_std,
   np = dd$np_std,
   lf = as.integer(dd$glottologFamily)
@@ -57,7 +57,7 @@ m1.1 <- ulam(
     a_sigma ~ dexp(1),
     b_sigma ~ dexp(1),
     sigma ~ dexp(1)
-  ), data = dat, chains = 4, cores = 4,iter=1000)
+  ), data = dat1.1, chains = 4, cores = 4,iter=1000)
 
 precis(m1.1, depth = 2)
 
@@ -94,7 +94,7 @@ dd$log_pop_std <- dd$log_pop /mean(dd$log_pop)
 dd$np_std <- dd$nPhonemes /max(dd$nPhonemes)
 
 
-dat <- list(
+dat1.2 <- list(
   pop = dd$log_pop_std,
   np = dd$np_std,
   cid = as.integer(dd$continent)
@@ -114,7 +114,7 @@ m1.2 <- ulam(
     a_sigma ~ dexp(1),
     b_sigma ~ dexp(1),
     sigma ~ dexp(1)
-  ), data = dat, chains = 4, cores = 4,iter=1000)
+  ), data = dat1.2, chains = 4, cores = 4,iter=1000)
 
 precis(m1.2, depth = 2)
 
@@ -128,7 +128,7 @@ dd <- d[complete.cases(d$population) , ]
 dd$log_pop_std <- dd$log_pop /mean(dd$log_pop)
 dd$np_std <- dd$nPhonemes /max(dd$nPhonemes)
 
-dat <- list(
+dat1.3 <- list(
   pop = dd$log_pop_std,
   np = dd$np_std,
   cid = as.integer(dd$continent),
@@ -139,6 +139,7 @@ dat <- list(
 m1.3 <- ulam(
   alist(
     pop ~ dnorm(mu, sigma),
+    #a questionable parameter b
     mu <- c[lf] + a[cid] + b*(np - 0.2506349),
     #adaptive priors
     #temporary priors, to be amended
@@ -152,7 +153,7 @@ m1.3 <- ulam(
     b_sigma ~ dexp(1),
     c_sigma ~ dexp(1),
     sigma ~ dexp(1)
-  ), data = dat, chains = 4, cores = 4,iter=1000)
+  ), data = dat1.3, chains = 4, cores = 4,iter=1000)
 
 precis(m1.3, depth = 2)
 
@@ -163,22 +164,71 @@ a <- rnorm(N,a_bar, a_sigma)
 a_bar <- rnorm(N,0, 1.5)
 b <- rnorm(N,b_bar, b_sigma)
 b_bar <- rnorm(N,0, 1.5)
+c <- dnorm(c_bar, c_sigma)
+c_bar <- dnorm(0, 1.5)
 a_sigma <- rexp(N,1)
 b_sigma <- rexp(N,1)
 sigma <- rexp(N,1)
+c_sigma <- rexp(N,1)
 
 plot( NULL , xlim=range(dd$log_pop_std) , ylim=c(-30,30) ,
       xlab="standard log population" , ylab="nPhonemes" )
 abline( h=0 , lty=2 )
 abline( h=272 , lty=1 , lwd=0.5 )
-mtext( " b_bar ~ dnorm(0, 1.5), a_bar ~ dnorm(0, 1.5)" )
+mtext( " b_bar ~ dnorm(0, 1.5), a_bar ~ dnorm(0, 1.5), c_bar <- dnorm(0, 1.5)" )
 xbar <- mean(dd$np_std)
-for ( i in 1:N ) curve( a[i] + b[i]*(x - xbar) ,
+for ( i in 1:N ) curve( a[i] + c[i] + b[i]*(x - xbar) ,
                         from=min(dd$log_pop_std) ,
                         to=max(dd$log_pop_std) , 
                         add=TRUE ,
                         col=col.alpha("black",0.2) )
 
+"a hierarchical model with language families as random effect(a Poisson regression instead of a linear regression)"
 
+dat2.1 <- list(
+  pop = dd$log_pop_std,
+  np = d$nPhonemes,
+  lf = as.integer(dd$glottologFamily)
+)
 
+m2.1 <- ulam(
+  alist(
+np ~ dpois(lambda),
+log(lambda) <- a[lf] + b[lf]*np,
+#adaptive priors
+#temporary priors, to be amended
+a[lf] ~ dnorm(a_bar, a_sigma),
+a_bar ~ dnorm(0, 1.5),
+b[lf] ~ dnorm(b_bar, b_sigma),
+b_bar ~ dnorm(0, 1.5),
+a_sigma ~ dexp(1),
+b_sigma ~ dexp(1),
+sigma ~ dexp(1)
+  ), data = dat2.1, chains = 4, log_lik = TRUE)
 
+precis(m2.1, depth = 2)
+
+"a hierarchical model with continents as random effect(a Poisson regression instead of a linear regression)"
+
+dat2.2 <- list(
+  pop = dd$log_pop_std,
+  np = d$nPhonemes,
+  cid = as.integer(dd$continent)
+)
+
+m2.2 <- ulam(
+  alist(
+    np ~ dpois(lambda),
+    log(lambda) <- a[cid] + b[cid]*np,
+    #adaptive priors
+    #temporary priors, to be amended
+    a[cid] ~ dnorm(a_bar, a_sigma),
+    a_bar ~ dnorm(0, 1.5),
+    b[cid] ~ dnorm(b_bar, b_sigma),
+    b_bar ~ dnorm(0, 1.5),
+    a_sigma ~ dexp(1),
+    b_sigma ~ dexp(1),
+    sigma ~ dexp(1)
+  ), data = dat2.2, chains = 4, log_lik = TRUE)
+
+precis(m2.2, depth = 2)
