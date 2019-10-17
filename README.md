@@ -1,6 +1,6 @@
 # Term-Project-Bayesian-Regression-Analysis
 ## A bayesian regression analysis with R and Stan（an R interface to Stan in rethinking package）.<br/>
-Conduct a series of Bayesian regression analyses to test whether an association between 2 variables(Sound inventory size vs. population size) is genuine, with rethinking package.<br/>
+Conduct a series of Bayesian regression analyses to test whether an association between two variables(Sound inventory size vs. population size) is genuine, with rethinking package.<br/>
  Specifically, fit the following models:<br/>
 * a simple linear regression with log(population size) as independent variable and log(sound inventory size) as dependent variable<br/>
 * a hierarchical model with language families as random effect,<br/>
