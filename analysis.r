@@ -2,7 +2,7 @@ library(ggplot2)
 library(rethinking)
 "Conduct a series of Bayesian regression analyses to test whether an association is genuine.
 Author: Jinghua Xu
-Last modified date: 16 Oct, 2019"
+Last modified date: 17 Oct, 2019"
 
 "given codes in project description"
 
