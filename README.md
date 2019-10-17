@@ -10,7 +10,7 @@ Conduct a series of Bayesian regression analyses to test whether an association 
 * a hierarchical model with both language families and continents as random effect.<br/>
 
 Use Stan to estimate the posterior distributions.<br/>
-Repeat theses analysis with a Poisson regression instead of a linear regression, with untrans- formed number of phonemes as dependent variable.<br/>
+Repeat theses analysis with a Poisson regression instead of a linear regression, with untransformed number of phonemes as dependent variable.<br/>
 
 Use prior predictive checks to determine a wisely-chosen prior.<br/>
 Model comparison via WAIC.<br/>
