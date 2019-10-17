@@ -12,7 +12,7 @@ Conduct a series of Bayesian regression analyses to test whether an association 
 Use Stan to estimate the posterior distributions.<br/>
 Repeat theses analysis with a Poisson regression instead of a linear regression, with untrans- formed number of phonemes as dependent variable.<br/>
 
-Using prior predictive checks to determine a wisely-chosen prior.<br/>
+Use prior predictive checks to determine a wisely-chosen prior.<br/>
 Model comparison via WAIC.<br/>
 
 A discussion about findings is included.
