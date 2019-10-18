@@ -2,7 +2,14 @@ library(ggplot2)
 library(rethinking)
 "Conduct a series of Bayesian regression analyses to test whether an association is genuine.
 Author: Jinghua Xu
-Last modified date: 17 Oct, 2019"
+Last modified date: 18 Oct, 2019
+Honor Code:  I pledge that this program represents my own work. I took a reference to the example codes in the textbook Statistical Rethinking."
+
+"to-be-addressed issues list:
+-questionable slope in hierarchical models with multiple random effects
+-sloppy priors in all models to be improved
+-more prior predictive checks to be added and ran
+-models with null pointers"
 
 "given codes in project description"
 
@@ -57,10 +64,10 @@ m1.1 <- ulam(
     a_sigma ~ dexp(1),
     b_sigma ~ dexp(1),
     sigma ~ dexp(1)
-  ), data = dat1.1, chains = 4, cores = 4,iter=1000)
+  ), data = dat1.1, chains = 4, cores = 4,iter=1000, log_lik = TRUE)
 
 precis(m1.1, depth = 2)
-
+WAIC(m1.1)
 #prior predictive check
 set.seed(1111)
 N <- 111
@@ -114,10 +121,11 @@ m1.2 <- ulam(
     a_sigma ~ dexp(1),
     b_sigma ~ dexp(1),
     sigma ~ dexp(1)
-  ), data = dat1.2, chains = 4, cores = 4,iter=1000)
+  ), data = dat1.2, chains = 4, cores = 4,iter=1000, log_lik = TRUE)
 
 precis(m1.2, depth = 2)
-
+WAIC(m1.2)
+compare(m1.1, m1.2)
 #prior predictiva check is carried out the same way as in the previous model
 
 "a hierarchical model with both language families and continents as random effect."
@@ -153,9 +161,12 @@ m1.3 <- ulam(
     b_sigma ~ dexp(1),
     c_sigma ~ dexp(1),
     sigma ~ dexp(1)
-  ), data = dat1.3, chains = 4, cores = 4,iter=1000)
+  ), data = dat1.3, chains = 4, cores = 4,iter=1000, log_lik = TRUE)
 
 precis(m1.3, depth = 2)
+WAIC(m1.3)
+compare(m1.1, m1.2, m1.3)
+
 
 #prior predictive check(to be amended)
 set.seed(1111)
@@ -207,6 +218,8 @@ sigma ~ dexp(1)
   ), data = dat2.1, chains = 4, log_lik = TRUE)
 
 precis(m2.1, depth = 2)
+WAIC(m2.1)
+compare(m1.1, m1.2, m1.3, m2.1)
 
 "a hierarchical model with continents as random effect(a Poisson regression instead of a linear regression)"
 
@@ -232,3 +245,44 @@ m2.2 <- ulam(
   ), data = dat2.2, chains = 4, log_lik = TRUE)
 
 precis(m2.2, depth = 2)
+WAIC(m2.2)
+compare(m1.1, m1.2, m1.3, m2.1, m2.2)
+
+
+"a hierarchical model with both language family and continents as random effects(a Poisson regression instead of a linear regression)"
+
+#data pre-process
+d$log_pop <- log(d$population)
+dd <- d[complete.cases(d$population) , ]
+dd$log_pop_std <- dd$log_pop /mean(dd$log_pop)
+
+dat2.3 <- list(
+  pop = dd$log_pop_std,
+  np = d$nPhonemes,
+  cid = as.integer(dd$continent),
+  lf = as.integer(dd$glottologFamily)
+)
+
+
+m2.3 <- ulam(
+  alist(
+    np ~ dpois(lambda),
+    log(lambda) <- c[lf] + a[cid] + b*(np - 0.2506349),
+    #adaptive priors
+    #temporary priors, to be improved
+    a[cid] ~ dnorm(a_bar, a_sigma),
+    a_bar ~ dnorm(0, 1.5),
+    b ~ dnorm(b_bar, b_sigma),
+    b_bar ~ dnorm(0, 1.5),
+    c[lf] ~ dnorm(c_bar, c_sigma),
+    c_bar ~ dnorm(0, 1.5),
+    a_sigma ~ dexp(1),
+    b_sigma ~ dexp(1),
+    c_sigma ~ dexp(1),
+    sigma ~ dexp(1)
+  ), data = dat2.3, chains = 4, log_lik = TRUE)
+
+precis(m2.3, depth = 2)
+WAIC(m2.3)
+compare(m1.1, m1.2, m1.3, m2.1, m2.2, m2.3)
+
