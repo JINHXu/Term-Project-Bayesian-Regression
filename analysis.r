@@ -9,7 +9,7 @@ Honor Code:  I pledge that this program represents my own work. I took a referen
 -questionable slope in hierarchical models with multiple random effects
 -sloppy priors in all models to be improved
 -more prior predictive checks to be added and ran
--models with null pointers"
+-models with null pointers(probably because it is, which does not matter)"
 
 "given codes in project description"
 
