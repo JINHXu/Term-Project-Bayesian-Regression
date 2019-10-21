@@ -2,14 +2,14 @@ library(ggplot2)
 library(rethinking)
 "Conduct a series of Bayesian regression analyses to test whether an association is genuine.
 Author: Jinghua Xu
-Last modified date: 18 Oct, 2019
+Last modified date: 21 Oct, 2019
 Honor Code:  I pledge that this program represents my own work. I took a reference to the example codes in the textbook Statistical Rethinking."
 
 "to-be-addressed issues list:
 -questionable slope in hierarchical models with multiple random effects
 -sloppy priors in all models to be improved
 -more prior predictive checks to be added and ran
--models with null pointers(probably because it is, which does not matter)"
+-models with null pointers"
 
 "given codes in project description"
 
@@ -285,4 +285,15 @@ m2.3 <- ulam(
 precis(m2.3, depth = 2)
 WAIC(m2.3)
 compare(m1.1, m1.2, m1.3, m2.1, m2.2, m2.3)
+"The first column contains the WAIC values. Smaller values are better, and the models are ordered by WAIC, from best to worst. "
+
+"sample to see HPDI"
+"how to sample from mcmc"
+
+
+samples <- extract.samples(m1.3)
+HPDI(samples, prob = 0.85)
+
+
+'In the best model, does the 89% Highest Posterior Density interval for the slope include 0?'
 
