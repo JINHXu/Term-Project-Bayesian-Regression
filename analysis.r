@@ -1,16 +1,10 @@
 library(ggplot2)
 library(rethinking)
+
 "Conduct a series of Bayesian regression analyses to test whether an association is genuine.
 Author: Jinghua Xu
 Last modified date: 21 Oct, 2019
-Honor Code:  I pledge that this program represents my own work. I took a reference to the example codes in the textbook Statistical Rethinking."
-
-"to-be-addressed issues:
--questionable slope in hierarchical models with multiple random effects
--sloppy priors in all models to be improved
--more prior predictive checks to be added and ran"
-
-"given codes in project description"
+Honor Code:  I pledge that this program represents my own work."
 
 
 d <- read.csv('soundInventoryPopulation.csv')
