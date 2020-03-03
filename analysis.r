@@ -288,5 +288,5 @@ samples <- extract.samples(m1.3)
 HPDI(samples, prob = 0.85)
 
 
-'In the best model, does the 89% Highest Posterior Density interval for the slope include 0?'
+'In the best model, the 89% Highest Posterior Density interval for the slope include 0'
 
