@@ -2,6 +2,9 @@
 
 **A bayesian regression analysis with R and Stan（an R interface to Stan in rethinking package).<br/>**
 
+This effect has been critically discussed in
+Steven Moran, Daniel McCloy, and Richard Wright. Revisiting the population vs phoneme- inventory correlation. Language, 88(4):877–893, 2012
+
 Conduct a series of Bayesian regression analyses to test whether an association between two variables(Sound inventory size vs. population size) is genuine, with rethinking package.<br/>
  Specifically, fit the following models:<br/>
 * a simple linear regression with log(population size) as independent variable and log(sound inventory size) as dependent variable<br/>
