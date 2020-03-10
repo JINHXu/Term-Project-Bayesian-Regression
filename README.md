@@ -6,7 +6,7 @@ Conduct a series of Bayesian regression analyses to test whether an association 
  Specifically, fit the following models:<br/>
 * a simple linear regression with log(population size) as independent variable and log(sound inventory size) as dependent variable<br/>
 * a hierarchical model with language families as random effect,<br/>
-* a hierarchical model with language families as random effect,<br/>
+* a hierarchical model with continents as random effect,<br/>
 * a hierarchical model with both language families and continents as random effect.<br/>
 
 Use Stan to estimate the posterior distributions.<br/>
