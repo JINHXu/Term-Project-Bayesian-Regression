@@ -19,5 +19,3 @@ Repeat theses analysis with a Poisson regression instead of a linear regression,
 
 Use prior predictive checks to determine a wisely-chosen prior.<br/>
 Model comparison via WAIC.<br/>
-
-A discussion about findings is included.
