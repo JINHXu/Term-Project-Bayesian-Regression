@@ -18,7 +18,7 @@ ggplot(d, aes(x=population, y=nPhonemes)) +
   scale_y_log10()
 
 
-"A simple linear regression with log(population size) as independent variable and log(sound inventory size) as dependent variable"
+"A simple linear regression with log(population size) as independent variable and log(sound inventory size) as dependent variable(non-bayesian)"
 
 ggplot(d, aes(x=log(population), y=log(nPhonemes))) +
   geom_point() +
@@ -26,17 +26,62 @@ ggplot(d, aes(x=log(population), y=log(nPhonemes))) +
   scale_x_continuous() +
   scale_y_continuous()
 
-
-"A hierarchical model with language families as random effect"
-
-
 # data pre-process
-d$log_pop <- log(d$population)
-dd <- d[complete.cases(d$population) , ]
-dd$log_pop_std <- dd$log_pop /mean(dd$log_pop)
-dd$np_std <- dd$nPhonemes /max(dd$nPhonemes)
+dd = d[complete.cases(d$population) , ]
+dd$log_pop = log(d$population)
+dd$log_pop_std = dd$log_pop /mean(dd$log_pop)
+dd$np_std = dd$nPhonemes /max(dd$nPhonemes)
+dd$log_np = log(d$nPhonemes)
 
 print(mean(dd$np_std))
+print(mean(dd$log_np))
+head(dd)
+
+"A simple linear regression with log(population size) as independent variable and log(sound inventory size) as dependent variable(bayesian)"
+dat1.0 = list(
+  lpop = dd$log_pop,
+  lnp = dd$log_np)
+
+m1.0 <- ulam(
+  alist(
+    lpop ~ dnorm(mu, sigma),
+    mu <- a + b*(lnp - 3.501372),
+    # conventional priors
+    a ~ dnorm(a_bar, a_sigma),
+    a_bar ~ dnorm(0, 1.5),
+    b ~ dnorm(b_bar, b_sigma),
+    b_bar ~ dnorm(0, 1.5),
+    a_sigma ~ dexp(1),
+    b_sigma ~ dexp(1),
+    sigma ~ dexp(1)
+  ), data = dat1.0, chains = 4, cores = 4,iter=1000, log_lik = TRUE)
+
+# Tables of marginal distributions.
+precis(m1.0, depth = 2)
+"A fine model with reasonable n_eff(about the sample size) and Rhat(approach 1) values"
+WAIC(m1.0)
+
+# posterior
+post1.0 <- extract.samples( m1.0 )
+# display raw data and sample size
+plot( dd$log_pop , dd$log_np ,
+      xlim=range(dd$log_pop) , ylim=range(dd$log_np) ,
+      col=rangi2 , xlab="log population" , ylab="log sound inventary size" )
+mtext(concat("N = ",1000))
+# plot the lines, with transparency
+for ( i in 1:1000 )
+  curve( post1.0$a[i] + post1.0$b[i]*(x-mean(3.501372)) ,
+         col=col.alpha("black",0.3) , add=TRUE )
+
+
+
+
+
+
+
+
+
+"A hierarchical model with language families as random effect"
 
 
 dat1.1 <- list(
@@ -44,24 +89,6 @@ dat1.1 <- list(
   np = dd$np_std,
   lf = as.integer(dd$glottologFamily)
 )
-
-
-m1.1 <- ulam(
-  alist(
-    pop ~ dnorm(mu, sigma),
-    mu <- a[lf] + b[lf]*(np - 0.2506349),
-    # conventional priors
-    a[lf] ~ dnorm(a_bar, a_sigma),
-    a_bar ~ dnorm(0, 1.5),
-    b[lf] ~ dnorm(b_bar, b_sigma),
-    b_bar ~ dnorm(0, 1.5),
-    a_sigma ~ dexp(1),
-    b_sigma ~ dexp(1),
-    sigma ~ dexp(1)
-  ), data = dat1.1, chains = 4, cores = 4,iter=1000, log_lik = TRUE)
-
-precis(m1.1, depth = 2)
-WAIC(m1.1)
 
 # prior predictive simulation for the conventional priors
 curve( dnorm( x , 0 , 1.5 ) , from= -10 , to=10 )
@@ -91,6 +118,30 @@ for ( i in 1:N ) curve( a[i] + b[i]*(x - xbar) ,
                         add=TRUE ,
                         col=col.alpha("black",0.2) )
 
+
+
+m1.1 <- ulam(
+  alist(
+    pop ~ dnorm(mu, sigma),
+    mu <- a[lf] + b[lf]*(np - 0.2506349),
+    # conventional priors
+    a[lf] ~ dnorm(a_bar, a_sigma),
+    a_bar ~ dnorm(0, 1.5),
+    b[lf] ~ dnorm(b_bar, b_sigma),
+    b_bar ~ dnorm(0, 1.5),
+    a_sigma ~ dexp(1),
+    b_sigma ~ dexp(1),
+    sigma ~ dexp(1)
+  ), data = dat1.1, chains = 4, cores = 4,iter=1000, log_lik = TRUE)
+
+# Tables of marginal distributions.
+precis(m1.1, depth = 2)
+"A fine model with reasonable n_eff(about the sample size) and Rhat(approach 1) values"
+WAIC(m1.1)
+
+# posterior
+post = extract.samples(m1.1)
+post
 
 "a hierarchical model with continents as random effect"
 
@@ -276,7 +327,7 @@ m2.3 <- ulam(
     sigma ~ dexp(1)
   ), data = dat2.3, chains = 4, log_lik = TRUE)
 
-precis(m2.3, depth = 2)
+precis(m2.3, depth =2) 
 WAIC(m2.3)
 compare(m1.1, m1.2, m1.3, m2.1, m2.2, m2.3)
 
