@@ -33,9 +33,35 @@ dd$log_pop_std = dd$log_pop /mean(dd$log_pop)
 dd$np_std = dd$nPhonemes /max(dd$nPhonemes)
 dd$log_np = log(d$nPhonemes)
 
+head(dd)
+
 print(mean(dd$np_std))
 print(mean(dd$log_np))
-head(dd)
+
+
+# prior predictive check
+set.seed(1111)
+N <- 111
+a <- rnorm(N,a_bar, a_sigma)
+a_bar <- rnorm(N,0, 1.5)
+b <- rnorm(N,b_bar, b_sigma)
+b_bar <- rnorm(N,0, 1.5)
+a_sigma <- rexp(N,1)
+b_sigma <- rexp(N,1)
+sigma <- rexp(N,1)
+
+plot( NULL , xlim=range(dd$log_pop_std) , ylim=c(-30,30) ,
+      xlab="standard log population" , ylab="nPhonemes" )
+abline( h=0 , lty=2 )
+abline( h=272 , lty=1 , lwd=0.5 )
+mtext( " b_bar ~ dnorm(0, 1.5), a_bar ~ dnorm(0, 1.5)" )
+xbar <- mean(dd$np_std)
+for ( i in 1:N ) curve( a[i] + b[i]*(x - xbar) ,
+                        from=min(dd$log_pop_std) ,
+                        to=max(dd$log_pop_std) , 
+                        add=TRUE ,
+                        col=col.alpha("black",0.2) )
+
 
 "A simple linear regression with log(population size) as independent variable and log(sound inventory size) as dependent variable(bayesian)"
 dat1.0 = list(
@@ -74,13 +100,6 @@ for ( i in 1:1000 )
          col=col.alpha("black",0.3) , add=TRUE )
 
 
-
-
-
-
-
-
-
 "A hierarchical model with language families as random effect"
 
 
@@ -93,31 +112,6 @@ dat1.1 <- list(
 # prior predictive simulation for the conventional priors
 curve( dnorm( x , 0 , 1.5 ) , from= -10 , to=10 )
 curve((dexp(x, 1)))
-
-
-# prior predictive check
-set.seed(1111)
-N <- 111
-a <- rnorm(N,a_bar, a_sigma)
-a_bar <- rnorm(N,0, 1.5)
-b <- rnorm(N,b_bar, b_sigma)
-b_bar <- rnorm(N,0, 1.5)
-a_sigma <- rexp(N,1)
-b_sigma <- rexp(N,1)
-sigma <- rexp(N,1)
-
-plot( NULL , xlim=range(dd$log_pop_std) , ylim=c(-30,30) ,
-      xlab="standard log population" , ylab="nPhonemes" )
-abline( h=0 , lty=2 )
-abline( h=272 , lty=1 , lwd=0.5 )
-mtext( " b_bar ~ dnorm(0, 1.5), a_bar ~ dnorm(0, 1.5)" )
-xbar <- mean(dd$np_std)
-for ( i in 1:N ) curve( a[i] + b[i]*(x - xbar) ,
-                        from=min(dd$log_pop_std) ,
-                        to=max(dd$log_pop_std) , 
-                        add=TRUE ,
-                        col=col.alpha("black",0.2) )
-
 
 
 m1.1 <- ulam(
