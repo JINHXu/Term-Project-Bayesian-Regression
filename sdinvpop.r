@@ -95,8 +95,8 @@ plot( dd$log_pop , dd$log_np ,
       col=rangi2 , xlab="log population" , ylab="log sound inventary size" )
 mtext(concat("N = ",1000))
 # plot the lines, with transparency
-for ( i in 1:1000 )
-  curve( post1.0$a[i] + post1.0$b[i]*(x-mean(3.501372)) ,
+for ( i in 1:100 )
+  curve( post1.0$a[i] + post1.0$b[i]*(x-3.501372) ,
          col=col.alpha("black",0.3) , add=TRUE )
 
 
@@ -133,9 +133,27 @@ precis(m1.1, depth = 2)
 "A fine model with reasonable n_eff(about the sample size) and Rhat(approach 1) values"
 WAIC(m1.1)
 
+
 # posterior
-post = extract.samples(m1.1)
-post
+post1.1 <- extract.samples( m1.1 )
+post1.1
+
+# display raw data and sample size
+plot( dd$log_pop_std , dd$np_std ,
+      xlim=range(dd$log_pop_std) , ylim=range(dd$np_std) ,
+      col=rangi2 , xlab="standardized log population" , ylab="standardized sound inventary size" )
+mtext(concat("N = ",100))
+
+# change j(1:5) to alter glotto family(random effect control)
+j = 1
+
+# plot the lines, with transparency
+for ( i in 1:100 )
+    curve( post1.1$a[j,i] + post1.1$b[j,i]*(x-0.2506349) ,
+           col=col.alpha("black",0.3) , add=TRUE )
+
+"The correaltion does not show within each language family."
+
 
 "a hierarchical model with continents as random effect"
 
@@ -144,6 +162,8 @@ d$log_pop <- log(d$population)
 dd <- d[complete.cases(d$population) , ]
 dd$log_pop_std <- dd$log_pop /mean(dd$log_pop)
 dd$np_std <- dd$nPhonemes /max(dd$nPhonemes)
+
+head(dd)
 
 
 dat1.2 <- list(
@@ -168,8 +188,29 @@ m1.2 <- ulam(
   ), data = dat1.2, chains = 4, cores = 4,iter=1000, log_lik = TRUE)
 
 precis(m1.2, depth = 2)
+# fine n_eff values about the sample size and Rhat values approaching 1
+
 WAIC(m1.2)
 compare(m1.1, m1.2)
+
+# posterior
+post1.2 <- extract.samples( m1.2 )
+post1.2
+
+# display raw data and sample size
+plot( dd$log_pop_std , dd$np_std ,
+      xlim=range(dd$log_pop_std) , ylim=range(dd$np_std) ,
+      col=rangi2 , xlab="standardized log population" , ylab="standardized sound inventary size" )
+mtext(concat("N = ",100))
+
+# change j(1:6) to alter continent(random effect control)
+j = 2
+
+# plot the lines, with transparency
+for ( i in 1:100 )
+  curve( post1.2$a[i,j] + post1.2$b[i,j]*(x - 0.2506349),
+         col=col.alpha("black",0.3) , add=TRUE )
+
 
 "a hierarchical model with both language families and continents as random effect."
 
@@ -206,6 +247,8 @@ m1.3 <- ulam(
   ), data = dat1.3, chains = 4, cores = 4,iter=1000, log_lik = TRUE)
 
 precis(m1.3, depth = 2)
+# a bad model
+
 WAIC(m1.3)
 compare(m1.1, m1.2, m1.3)
 
@@ -230,11 +273,33 @@ abline( h=0 , lty=2 )
 abline( h=272 , lty=1 , lwd=0.5 )
 mtext( " b_bar ~ dnorm(0, 1.5), a_bar ~ dnorm(0, 1.5), c_bar <- dnorm(0, 1.5)" )
 xbar <- mean(dd$np_std)
-for ( i in 1:N ) curve( a[i] + c[i] + b[i]*(x - xbar) ,
+for ( i in 1:N ) curve( a[i] + c[i] + b[i]*(x - 0.2506349) ,
                         from=min(dd$log_pop_std) ,
                         to=max(dd$log_pop_std) , 
                         add=TRUE ,
                         col=col.alpha("black",0.2) )
+
+# posterior
+post1.3 <- extract.samples( m1.3 )
+post1.3
+
+# display raw data and sample size
+plot( dd$log_pop_std , dd$np_std ,
+      xlim=range(dd$log_pop_std) , ylim=range(dd$np_std) ,
+      col=rangi2 , xlab="standardized log population" , ylab="standardized sound inventary size" )
+mtext(concat("N = ",100))
+
+# change j(1:6) to alter continent(random effect control)
+j = 1
+
+# change k(1:5) to alter language family(random effect control)
+k = 1
+
+# plot the lines, with transparency
+for ( i in 1:100 )
+  curve( post1.3$a[i,k] +post1.3$c[j,i] + post1.3$b[i]*(x - 0.2506349),
+         col=col.alpha("black",0.3) , add=TRUE )
+
 
 "a hierarchical model with language families as random effect(a Poisson regression instead of a linear regression)"
 
