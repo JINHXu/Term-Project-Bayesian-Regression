@@ -17,6 +17,8 @@ ggplot(d, aes(x=population, y=nPhonemes)) +
   scale_x_log10() +
   scale_y_log10()
 
+# Linear models
+
 
 "A simple linear regression with log(population size) as independent variable and log(sound inventory size) as dependent variable(non-bayesian)"
 
@@ -99,6 +101,8 @@ for ( i in 1:100 )
   curve( post1.0$a[i] + post1.0$b[i]*(x-3.501372) ,
          col=col.alpha("black",0.3) , add=TRUE )
 
+"A corelation between the 2 variables can be seen from the posterior plot. So far still unclear if the corelation is fake or not."
+
 
 "A hierarchical model with language families as random effect"
 
@@ -152,7 +156,7 @@ for ( i in 1:100 )
     curve( post1.1$a[j,i] + post1.1$b[j,i]*(x-0.2506349) ,
            col=col.alpha("black",0.3) , add=TRUE )
 
-"The correaltion does not show within each language family."
+"The correaltion does not show within each language family from the posterior plot, we have a first evidence that the corelation can be fake."
 
 
 "a hierarchical model with continents as random effect"
@@ -211,6 +215,7 @@ for ( i in 1:100 )
   curve( post1.2$a[i,j] + post1.2$b[i,j]*(x - 0.2506349),
          col=col.alpha("black",0.3) , add=TRUE )
 
+"The correaltion does not show within each language family from the posterior plot, we have a further evidence that the corelation can be fake."
 
 "a hierarchical model with both language families and continents as random effect."
 
@@ -300,6 +305,35 @@ for ( i in 1:100 )
   curve( post1.3$a[i,k] +post1.3$c[j,i] + post1.3$b[i]*(x - 0.2506349),
          col=col.alpha("black",0.3) , add=TRUE )
 
+"Absolutely no sign of a corelation between the 2 variables with 2 random effects being considered at the same time. Given the observations from previous 3 models, we can draw the conclusion that the corelation between the 2 variable of intrests is fake, at least not linear."
+
+
+# Poisson models
+
+################
+"a simple Poisson regression with log(population size) as independent variable and log(sound inventory size) as dependent variable"
+
+dat2.0 = list(
+  lpop = dd$log_pop,
+  lnp = dd$log_np)
+
+m2.0 <- ulam(
+  alist(
+    lnp ~ dpois(lambda),
+    log(lambda) <- a + b*lpop,
+    # conventional priors
+    a ~ dnorm(a_bar, a_sigma),
+    a_bar ~ dnorm(0, 1.5),
+    b ~ dnorm(b_bar, b_sigma),
+    b_bar ~ dnorm(0, 1.5),
+    a_sigma ~ dexp(1),
+    b_sigma ~ dexp(1),
+    sigma ~ dexp(1)
+  ), data = dat2.0, chains = 4, log_lik = TRUE)
+
+precis(m2.0, depth = 2)
+WAIC(m2.0)
+#####################
 
 "a hierarchical model with language families as random effect(a Poisson regression instead of a linear regression)"
 
@@ -311,7 +345,7 @@ dat2.1 <- list(
 
 m2.1 <- ulam(
   alist(
-    np ~ dpois(lambda),
+    pop ~ dpois(lambda),
     log(lambda) <- a[lf] + b[lf]*np,
     # conventional priors
     a[lf] ~ dnorm(a_bar, a_sigma),
@@ -326,6 +360,8 @@ m2.1 <- ulam(
 precis(m2.1, depth = 2)
 WAIC(m2.1)
 compare(m1.1, m1.2, m1.3, m2.1)
+
+# posterior
 
 "a hierarchical model with continents as random effect(a Poisson regression instead of a linear regression)"
 
@@ -391,6 +427,7 @@ WAIC(m2.3)
 compare(m1.1, m1.2, m1.3, m2.1, m2.2, m2.3)
 
 "The first column contains the WAIC values. Smaller values are better, and the models are ordered by WAIC, from best to worst. "
+
 "The best model is m1.3 according to WAIC values"
 
 
@@ -399,10 +436,3 @@ slope = samples$b
 HPDI(samples$b, prob = 0.89)
 
 'In the best model, the 89% Highest Posterior Density interval for the slope include 0'
-
-
-"Even in the best model m1.3, according to the precis() output, the Rhat values do not approach 1. And the small n_eff values should be alarming, these indicate that the association is likely to be fake."
-
-
-
-
