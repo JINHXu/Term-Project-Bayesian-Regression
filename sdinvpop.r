@@ -345,8 +345,8 @@ dat2.1 <- list(
 
 m2.1 <- ulam(
   alist(
-    pop ~ dpois(lambda),
-    log(lambda) <- a[lf] + b[lf]*np,
+    np ~ dpois(lambda),
+    log(lambda) <- a[lf] + b[lf]*pop,
     # conventional priors
     a[lf] ~ dnorm(a_bar, a_sigma),
     a_bar ~ dnorm(0, 1.5),
