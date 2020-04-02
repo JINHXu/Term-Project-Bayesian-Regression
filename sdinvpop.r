@@ -536,23 +536,58 @@ dat2.3 <- list(
 m2.3 <- ulam(
   alist(
     np ~ dpois(lambda),
-    log(lambda) <- c[lf] + a[cid] + b*(np - 0.2506349),
-    # conventional priors
-    a[cid] ~ dnorm(a_bar, a_sigma),
-    a_bar ~ dnorm(0, 1.5),
-    b ~ dnorm(b_bar, b_sigma),
-    b_bar ~ dnorm(0, 1.5),
-    c[lf] ~ dnorm(c_bar, c_sigma),
-    c_bar ~ dnorm(0, 1.5),
-    a_sigma ~ dexp(1),
-    b_sigma ~ dexp(1),
-    c_sigma ~ dexp(1),
-    sigma ~ dexp(1)
+    log(lambda) <- c[lf] + a[cid] + b*pop,
+    a[cid] ~ dnorm(3.5, 0.5),
+    b ~ dnorm(0, 0.2),
+    c[lf] ~ dnorm(3.5, 0.5)
   ), data = dat2.3, chains = 4, log_lik = TRUE)
 
 precis(m2.3, depth =2) 
+# acceptable n_eff values(mostly about the sample size) and fine Rhat values(approaching 1)
 
 WAIC(m2.3)
+
+# posterior
+post2.3 <- extract.samples( m2.3 )
+post2.3
+
+# display raw data and sample size
+plot( dd$log_pop_std , d$nPhonemes ,
+      xlim=range(dd$log_pop_std) , ylim=range(d$nPhonemes) ,
+      col=rangi2 , xlab="standardized log population" , ylab="nPhonemes" )
+mtext(concat("N = ",100))
+
+# change j(1:6) to alter continent(random effect control)
+cid = 1
+
+# change k(1:5) to alter language family(random effect control)
+lf = 1
+
+# plot the lines, with transparency
+for ( i in 1:100 )
+  curve( exp(post2.3$a[i,cid] +post2.3$c[lf,i] + post2.3$b[i]*x),
+         col=col.alpha("black",0.3) , add=TRUE )
+
+
+# posterior
+k <- LOOPk(m2.3)
+plot( dd$log_pop_std , d$nPhonemes , xlab="standardized log population" , ylab="nPhonemes" ,
+      col=rangi2 , pch =ifelse( as.integer(dd$continent)==5 & as.integer(dd$glottologFamily) == 1, 19 , 3 ), lwd=1 ,
+      ylim=c(0,75) , cex=1+normalize(k) )
+
+# set up the horizontal axis values to compute predictions at
+ns <- 100
+P_seq <- seq( from=-1.4 , to=3 , length.out=ns )
+
+# change lf to alter language family(random effect control)
+lambda <- link( m2.3 , data=data.frame( pop=P_seq , cid=5, lf = 1 ) )
+lmu <- apply( lambda , 2 , mean )
+lci <- apply( lambda , 2 , PI )
+lines( P_seq , lmu , lty=2 , lwd=1.5 )
+shade( lci , P_seq , xpd=TRUE )
+
+
+
 
 # The first column contains the WAIC values. Smaller values are better, and the models are ordered by WAIC, from best to worst. 
 compare(m1.1, m1.2, m1.3, m2.1, m2.2, m2.3)
