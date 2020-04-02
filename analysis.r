@@ -1,7 +1,8 @@
 library(ggplot2)
 library(rethinking)
 
-"Conduct a series of Bayesian regression analyses to test whether an association is genuine.
+"The historical version. See the source code of analysis go to https://github.com/JINHXu/soundInventoryPopulation/blob/master/sdinvpop.r
+Conduct a series of Bayesian regression analyses to test whether an association is genuine.
 Author: Jinghua Xu
 Last modified date: 21 Oct, 2019
 Honor Code:  I pledge that this program represents my own work."
