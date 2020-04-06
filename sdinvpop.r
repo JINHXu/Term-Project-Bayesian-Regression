@@ -17,8 +17,9 @@ ggplot(d, aes(x=population, y=nPhonemes)) +
   scale_x_log10() +
   scale_y_log10()
 
-## Linear models
 
+
+## Linear models
 
 "A simple linear regression with log(population size) as independent variable and log(sound inventory size) as dependent variable(non-bayesian)"
 
@@ -28,6 +29,10 @@ ggplot(d, aes(x=log(population), y=log(nPhonemes))) +
   scale_x_continuous() +
   scale_y_continuous()
 
+
+
+"A simple linear regression with log(population size) as independent variable and log(sound inventory size) as dependent variable(bayesian)"
+
 # data pre-process
 dd = d[complete.cases(d$population) , ]
 dd$log_pop = log(d$population)
@@ -35,13 +40,13 @@ dd$log_pop_std = dd$log_pop /mean(dd$log_pop)
 dd$np_std = dd$nPhonemes /max(dd$nPhonemes)
 dd$log_np = log(d$nPhonemes)
 
-head(dd)
+
 
 print(mean(dd$np_std))
 print(mean(dd$log_np))
 
 
-# prior predictive check
+# prior predictive check(of conventional priors which are apllied in the linear models)
 set.seed(1111)
 N <- 111
 a <- rnorm(N,a_bar, a_sigma)
@@ -65,7 +70,9 @@ for ( i in 1:N ) curve( a[i] + b[i]*(x - xbar) ,
                         col=col.alpha("black",0.2) )
 
 
+
 "A simple linear regression with log(population size) as independent variable and log(sound inventory size) as dependent variable(bayesian)"
+
 dat1.0 = list(
   lpop = dd$log_pop,
   lnp = dd$log_np)
@@ -86,7 +93,7 @@ m1.0 <- ulam(
 
 # Tables of marginal distributions.
 precis(m1.0, depth = 2)
-"A fine model with reasonable n_eff(about the sample size) and Rhat(approach 1) values"
+"A fine model with reasonable n_eff(about the sample size) and Rhat(approaching 1) values"
 WAIC(m1.0)
 
 # posterior
@@ -102,6 +109,8 @@ for ( i in 1:100 )
          col=col.alpha("black",0.3) , add=TRUE )
 
 "A corelation between the 2 variables can be seen from the posterior plot. So far still unclear if the corelation is fake or not."
+
+
 
 
 "A hierarchical model with language families as random effect"
@@ -153,10 +162,10 @@ j = 1
 
 # plot the lines, with transparency
 for ( i in 1:100 )
-    curve( post1.1$a[j,i] + post1.1$b[j,i]*(x-0.2506349) ,
-           col=col.alpha("black",0.3) , add=TRUE )
+  curve( post1.1$a[j,i] + post1.1$b[j,i]*(x-0.2506349) ,
+         col=col.alpha("black",0.3) , add=TRUE )
 
-"The correaltion does not show within each language family from the posterior plot, we have a first evidence that the corelation can be fake."
+"The correaltion does not show within each language family from the posterior plots of each langauge, we have a first evidence that the corelation can be fake."
 
 
 "a hierarchical model with continents as random effect"
@@ -216,6 +225,8 @@ for ( i in 1:100 )
          col=col.alpha("black",0.3) , add=TRUE )
 
 "The correaltion does not show within each language family from the posterior plot, we have a further evidence that the corelation can be fake."
+
+
 
 "a hierarchical model with both language families and continents as random effect."
 
@@ -310,9 +321,7 @@ for ( i in 1:100 )
 
 ## Poisson models
 
-# prior predictive checks
-
-# determine prior alpha
+# prior predictive checks to determine proper prior for poisson models
 
 mean(d$nPhonemes)
 
@@ -347,6 +356,7 @@ for ( i in 1:N ) curve( exp( a[i] + b[i]*x ) , add=TRUE , col=col.alpha("black",
 
 
 "a simple Poisson regression without randowm effects."
+
 dat2.0 <- list(
   pop = dd$log_pop_std,
   np = d$nPhonemes
@@ -363,6 +373,7 @@ m2.0 <- ulam(
 
 precis(m2.0, depth = 2)
 
+
 # posterior
 k <- LOOPk(m2.0)
 plot( dd$log_pop_std , d$nPhonemes , xlab="standardized log population" , ylab="nPhonemes" ,
@@ -377,6 +388,7 @@ lmu <- apply( lambda , 2 , mean )
 lci <- apply( lambda , 2 , PI )
 lines( P_seq , lmu , lty=2 , lwd=1.5 )
 shade( lci , P_seq , xpd=TRUE )
+
 
 # posterior
 post2.0 <- extract.samples( m2.0 )
@@ -439,7 +451,6 @@ lf = 5
 for ( i in 1:100 )
   curve( exp(post2.1$a[lf,i] + post2.1$b[lf,i]*x),
          col=col.alpha("black",0.3) , add=TRUE )
-
 
 
 # posterior
@@ -586,8 +597,9 @@ lci <- apply( lambda , 2 , PI )
 lines( P_seq , lmu , lty=2 , lwd=1.5 )
 shade( lci , P_seq , xpd=TRUE )
 
+"Conclude from the posteriors of Poisson (hierachical) models, there is reason to believe a latent Poisson regression exists between the 2 variables of interests."
 
-
+"Conclude from all of the models above, the regression can never be linear, but possibly poisson."
 
 # The first column contains the WAIC values. Smaller values are better, and the models are ordered by WAIC, from best to worst. 
 compare(m1.1, m1.2, m1.3, m2.1, m2.2, m2.3)
