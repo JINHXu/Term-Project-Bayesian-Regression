@@ -1,10 +1,8 @@
 library(ggplot2)
 library(rethinking)
 
-"Conduct a series of Bayesian regression analyses to test whether the association positive correlation between population size and sound inventory size is genuine.
-Author: Jinghua Xu
-Honor Code:  I pledge that this program represents my own work."
-
+"A series of Bayesian regression analyses to test whether the association positive correlation between population size and sound inventory size is genuine.
+by Jinghua Xu"
 
 d <- read.csv('soundInventoryPopulation.csv')
 
