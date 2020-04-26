@@ -21,5 +21,5 @@ Use prior predictive checks to determine a wisely-chosen prior.<br/>
 Model comparison via WAIC.<br/>
 
 _View the [code](https://github.com/JINHXu/soundInventoryPopulation/blob/master/sdinvpop.r)_<br/>
-_[as project on Kaggle](https://www.kaggle.com/xujinghua/soundinventarypopulation)_<br/>
-_[Jupyter notebook](https://github.com/JINHXu/soundInventoryPopulation/blob/master/soundinventarypopulation.ipynb)_
+_View on [Kaggle](https://www.kaggle.com/xujinghua/soundinventarypopulation)_<br/>
+_View [Jupyter notebook](https://github.com/JINHXu/soundInventoryPopulation/blob/master/soundinventarypopulation.ipynb)_
