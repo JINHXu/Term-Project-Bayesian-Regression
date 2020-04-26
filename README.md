@@ -1,4 +1,4 @@
-# Sound-Inventory-Population 
+# Sound inventory size vs. population size
 **A bayesian regression analysis with R and Stan（an R interface to Stan in rethinking package).<br/>**
 
 > _Bayesian data analysis: count all the ways data can happen, accoding to assumptions. Assumptions with more ways that are consistent with data are more plausible._
